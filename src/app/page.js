@@ -5,33 +5,36 @@ import Link from "next/link";
 export default function HomePage() {
   return (
     <main className="landing-page">
-      <section className="hero">
+      <section>
         <h1>Benvenuti nella nostra Escape Room</h1>
         <p>Vivi un’esperienza unica con amici e familiari!</p>
         <Link href="/login">
-          <button className="btn btn-primary">Accedi / Prenota</button>
+          <button>Accedi / Prenota</button>
         </Link>
       </section>
 
-      <section className="rooms-overview">
+      <section>
         <h2>Le nostre stanze</h2>
-        <div className="rooms-list">
-          <Link href="/room/1">
-            <div className="room-card">La stanza dei misteri</div>
+        <div>
+          <Link href="/room/test">
+            <div className="room-card">Room Test</div>
           </Link>
-          <Link href="/room/2">
-            <div className="room-card">La stanza dei segreti</div>
+          <Link href="/room/test">
+            <div className="room-card">Room Test</div>
           </Link>
-          <Link href="/room/3">
-            <div className="room-card">La stanza del tempo</div>
+          <Link href="/room/test">
+            <div className="room-card">Room Test</div>
+          </Link>
+          <Link href="/room/test">
+            <div className="room-card">Room Test</div>
           </Link>
         </div>
       </section>
 
-      <section className="cta">
+      <section>
         <h2>Prenota ora la tua esperienza!</h2>
         <Link href="/login">
-          <button className="btn btn-secondary">Prenota</button>
+          <button>Prenota</button>
         </Link>
       </section>
     </main>

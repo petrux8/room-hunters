@@ -1,22 +1,27 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
+import { useFirebaseAuth } from "@/context/FirebaseAuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
+import PrivateHeader from "@/components/layout/PrivateHeader";
+
 export default function PrivateLayout({ children }) {
-  const { currentUser, loading } = useAuth();
+  const { currentUser, loading } = useFirebaseAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !currentUser) router.replace("/login");
+    if (!loading && !currentUser) {
+      router.replace("/login");
+    }
   }, [currentUser, loading, router]);
 
   if (loading || !currentUser) return null;
 
   return (
     <>
-      <main>{children}</main>
+      <PrivateHeader />
+      <main className="container py-4">{children}</main>
     </>
   );
 }
