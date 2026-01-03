@@ -1,5 +1,5 @@
-"use client";
+import PageWrapper from "@/components/PageWrapper";
 
-export default function LoginLayout({ children }) {
-  return <div className="login-layout">{children}</div>;
+export default function AuthLayout({ children }) {
+  return <PageWrapper minimalHeader={true}>{children}</PageWrapper>;
 }

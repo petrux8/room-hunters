@@ -1,12 +1,5 @@
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import PageWrapper from "@/components/PageWrapper";
 
 export default function PublicLayout({ children }) {
-  return (
-    <>
-      <Header />
-      <main>{children}</main>
-      <Footer />
-    </>
-  );
+  return <PageWrapper>{children}</PageWrapper>;
 }

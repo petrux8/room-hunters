@@ -1,14 +1,12 @@
-import Header from "@/components/layout/Header";
+import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import PageWrapper from "@/components/PageWrapper";
 
 export default function RootLayout({ children }) {
   return (
     <html lang="it">
       <body>
-        <AuthProvider>
-          <Header />
-          <main>{children}</main>
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

@@ -1,43 +1,47 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOut,
   sendPasswordResetEmail,
   sendEmailVerification,
   updatePassword,
-  signOut,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
-export const signUp = (email, password) => {
-  return createUserWithEmailAndPassword(auth, email, password);
-};
+const googleProvider = new GoogleAuthProvider();
 
-export const signIn = (email, password) => {
-  return signInWithEmailAndPassword(auth, email, password);
-};
+export const authServices = {
+  signUp: (email, password) => {
+    return createUserWithEmailAndPassword(auth, email, password);
+  },
 
-export const signOutUser = () => {
-  return signOut(auth);
-};
+  signIn: (email, password) => {
+    return signInWithEmailAndPassword(auth, email, password);
+  },
 
-export const resetPassword = (email) => {
-  return sendPasswordResetEmail(auth, email);
-};
+  signOutUser: () => {
+    return signOut(auth);
+  },
 
-export const changePassword = (newPassword) => {
-  if (!auth.currentUser) {
-    throw new Error("No authenticated user"); //TODO: better handling
-  }
+  resetPassword: (email) => {
+    return sendPasswordResetEmail(auth, email);
+  },
 
-  return updatePassword(auth.currentUser, newPassword);
-};
+  changePassword: (newPassword) => {
+    if (!auth.currentUser) throw new Error("No authenticated user");
+    return updatePassword(auth.currentUser, newPassword);
+  },
 
-export const sendVerificationEmail = () => {
-  if (!auth.currentUser) {
-    throw new Error("No authenticated user"); //TODO: better handling
-  }
+  sendVerificationEmail: () => {
+    if (!auth.currentUser) throw new Error("No authenticated user");
+    return sendEmailVerification(auth.currentUser, {
+      url: window.location.origin,
+    });
+  },
 
-  return sendEmailVerification(auth.currentUser, {
-    url: `${window.location.origin}/`,
-  });
+  signInWithGoogle: () => {
+    return signInWithPopup(auth, googleProvider);
+  },
 };

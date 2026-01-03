@@ -4,7 +4,7 @@ import {
   persistentLocalCache,
   persistentSingleTabManager,
 } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -15,7 +15,7 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 
 const db = initializeFirestore(app, {
   localCache: persistentLocalCache({
@@ -24,5 +24,6 @@ const db = initializeFirestore(app, {
 });
 
 const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
 
-export { db, auth, app };
+export { db, auth, app, googleProvider };
