@@ -1,4 +1,4 @@
-export const room1Content = {
+export const content = {
   title: "Stanza Misteriosa",
   description: [
     "Benvenuti nella stanza più enigmatica della città.",
@@ -8,7 +8,5 @@ export const room1Content = {
   tips: [
     "Lavorate in squadra",
     "Osservate ogni dettaglio"
-  ],
-  maxPlayers: 6,
-  duration: 60, 
+  ]
 };

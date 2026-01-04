@@ -1,45 +1,45 @@
 "use client";
 
 import Link from "next/link";
-
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { rooms } from "@/data/rooms";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRooms } from "@/contexts/RoomsContext"; // ✅ nuovo
 
 export default function Header({ minimal = false }) {
-  const menuItems = [
-    { label: "Home", href: "/" },
-    {
-      label: "Room",
-      href: "/rooms",
-      submenu: rooms.map((room) => ({
-        label: room.name,
-        href: `/rooms/${room.slug}`,
-      })),
-    },
-    {
-      label: "Mie Prenotazioni",
-      href: "/prenotazioni",
-      requiresAuth: true, // <-- solo per utenti loggati
-    },
-  ];
-
-  const [openDropdown, setOpenDropdown] = useState(null);
+  const { rooms, loading: roomsLoading } = useRooms(); // ottieni stanze
+  const { currentUser, loading: authLoading, logout } = useAuth();
   const pathname = usePathname();
-  const { currentUser, loading, logout } = useAuth();
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   const isActive = (href) => {
     return pathname === href || pathname.startsWith(href + "/");
   };
 
+  // Menu principale
+  const menuItems = [
+    { label: "Home", href: "/" },
+    {
+      label: "Room",
+      href: "/rooms",
+      submenu: rooms
+        .filter((room) => room.active) // <-- solo stanze attive
+        .map((room) => ({
+          label: room.title,
+          href: `/rooms/${room.slug}`,
+        })),
+    },
+    {
+      label: "Mie Prenotazioni",
+      href: "/prenotazioni",
+      requiresAuth: true,
+    },
+  ];
+
   return (
     <header className="bg-bgHeader text-white px-6 py-4">
       <div className="max-w-6xl mx-auto flex justify-between items-center relative">
         {/* Logo */}
-        {/* <Link href="/">
-          <img src="/logo.jpg" alt="Escape Room Logo" className="h-10 w-auto" />
-        </Link> */}
         <Link href="/" className="font-bold text-lg">
           ROOM HUNTERS
         </Link>
@@ -48,7 +48,7 @@ export default function Header({ minimal = false }) {
         {!minimal && (
           <nav className="flex items-center gap-6 text-sm relative">
             {menuItems
-              .filter((item) => !item.requiresAuth || currentUser) // filtra se serve autenticazione
+              .filter((item) => !item.requiresAuth || currentUser)
               .map((item, idx) => (
                 <div
                   key={idx}
@@ -67,7 +67,8 @@ export default function Header({ minimal = false }) {
                     {item.label}
                   </Link>
 
-                  {item.submenu && openDropdown === idx && (
+                  {/* Sottomenu stanze */}
+                  {item.submenu && openDropdown === idx && !roomsLoading && (
                     <div className="absolute top-full left-0 mt-2 w-40 bg-white text-black rounded shadow-lg z-10">
                       {item.submenu.map((subItem, subIdx) => (
                         <Link
@@ -87,8 +88,8 @@ export default function Header({ minimal = false }) {
                 </div>
               ))}
 
-            {/* Login */}
-            {!loading &&
+            {/* Login / Logout */}
+            {!authLoading &&
               (currentUser ? (
                 <button
                   onClick={logout}

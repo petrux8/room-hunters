@@ -1,24 +1,40 @@
-import { room1Content } from "./rooms/room-1";
-import { room2Content } from "./rooms/room-2";
-import { room3Content } from "./rooms/room-3";
+import { roomsContents } from "./rooms.content";
 
-export const rooms = [
+export const fallbackRooms = [
   {
-    id: "room-1",
     slug: "room-1",
-    name: room1Content.title,
-    content: room1Content,
+    contentKey: "room-1",
   },
   {
-    id: "room-2",
     slug: "room-2",
-    name: room2Content.title,
-    content: room2Content,
+    contentKey: "room-2",
   },
   {
-    id: "room-3",
     slug: "room-3",
-    name: room3Content.title,
-    content: room3Content,
+    contentKey: "room-3",
+  },
+  {
+    slug: "room-4",
+    contentKey: "room-4",
   },
 ];
+
+export function composeRoom(roomFromDb) {
+  const content = roomsContents[roomFromDb.contentKey];
+
+  if (!content) {
+    throw new Error(
+      `Contenuto mancante per contentKey: ${roomFromDb.contentKey}`
+    );
+  }
+
+  return {
+    roomId: roomFromDb.roomId ?? null, // Firestore
+    slug: roomFromDb.slug,
+    title: content.title,
+    content,
+    maxPlayers: roomFromDb.maxPlayers ?? null,
+    duration: roomFromDb.duration ?? null,
+    active: roomFromDb.active ?? true,
+  };
+}
