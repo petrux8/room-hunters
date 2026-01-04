@@ -1,16 +1,19 @@
 "use client";
 
+import { mapFirebaseError } from "@/utils/firebaseErrors";
+import { useAuth } from "@/contexts/AuthContext";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
 import AuthInput from "@/components/AuthForm/AuthInput";
 import AuthButton from "@/components/AuthForm/AuthButton";
 import AuthToggleLink from "@/components/AuthForm/AuthToggleLink";
 import GoogleButton from "@/components/AuthForm/GoogleButton";
 
-import { mapFirebaseError } from "@/utils/firebaseErrors";
-import { useAuth } from "@/contexts/AuthContext";
-import { useState } from "react";
-
 export default function AuthForm() {
-  const { login, signup, loginWithGoogle } = useAuth();
+  const { currentUser, loading, login, signup, loginWithGoogle } = useAuth();
+  const router = useRouter();
+
   const [type, setType] = useState("login");
   const isLogin = type === "login";
 
@@ -23,6 +26,16 @@ export default function AuthForm() {
   });
 
   const [feedback, setFeedback] = useState(null);
+  const [firstUserCheck, setFirstUserCheck] = useState(true);
+
+  useEffect(() => {
+    if (!loading && currentUser && firstUserCheck) {
+      router.replace("/");
+    }
+    if (!loading) {
+      setFirstUserCheck(false);
+    }
+  }, [loading, currentUser, router, firstUserCheck]);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -41,9 +54,12 @@ export default function AuthForm() {
         await login(form.email, form.password);
         setFeedback({ type: "success", message: "Login riuscito!" });
       } else {
-        await signup(form.email, form.password);
+        await signup(form.email, form.password, form.firstName, form.lastName);
         setFeedback({ type: "success", message: "Registrazione riuscita!" });
       }
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
     } catch (error) {
       setFeedback({ type: "error", message: mapFirebaseError(error) });
     }
@@ -53,10 +69,18 @@ export default function AuthForm() {
     try {
       await loginWithGoogle();
       setFeedback({ type: "success", message: "Login con Google riuscito!" });
+
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
     } catch (error) {
       setFeedback({ type: "error", message: mapFirebaseError(error) });
     }
   };
+
+  if (loading) {
+    return <>Loading...</>; //TODO: Replace with spinner
+  }
 
   return (
     <div className="max-w-md mx-auto bg-white shadow-md rounded p-6">

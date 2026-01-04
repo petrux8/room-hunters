@@ -7,14 +7,41 @@ import {
   updatePassword,
   GoogleAuthProvider,
   signInWithPopup,
+  updateProfile,
 } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 
 const googleProvider = new GoogleAuthProvider();
 
 export const authServices = {
-  signUp: (email, password) => {
-    return createUserWithEmailAndPassword(auth, email, password);
+  signUp: (email, password, firstName, lastName) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        const user = userCredential.user;
+
+        const displayName = `${firstName} ${lastName}`;
+        await updateProfile(user, { displayName });
+
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          email: user.email,
+          displayName,
+          role: "user",
+          createdAt: serverTimestamp(),
+        });
+
+        resolve(user);
+      } catch (error) {
+        console.log(error);
+        reject(error);
+      }
+    });
   },
 
   signIn: (email, password) => {
@@ -42,6 +69,29 @@ export const authServices = {
   },
 
   signInWithGoogle: () => {
-    return signInWithPopup(auth, googleProvider);
+    return new Promise(async (resolve, reject) => {
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+
+        const userDocRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(userDocRef);
+
+        if (!docSnap.exists()) {
+          await setDoc(userDocRef, {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName || null,
+            role: "user",
+            createdAt: serverTimestamp(),
+          });
+        }
+
+        resolve(user);
+      } catch (error) {
+        console.log(error);
+        reject(error);
+      }
+    });
   },
 };
